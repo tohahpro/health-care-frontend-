@@ -1,0 +1,81 @@
+"use client"
+
+import { useActionState, useState } from "react";
+import { Button } from "./ui/button";
+import { Field, FieldDescription, FieldGroup, FieldLabel } from "./ui/field";
+import { Input } from "./ui/input";
+import { Eye, EyeOff } from "lucide-react";
+import Link from "next/link";
+import { loginUser } from "@/services/auth/loginUser";
+
+const LoginForm = () => {
+
+    const [state, formAction, isPending] = useActionState(loginUser, null);
+console.log(state);
+
+    const [showPassword, setShowPassword] = useState(false)
+    return (
+        <form action={formAction}>
+            <FieldGroup>
+                <div className="grid grid-cols-1 gap-4">
+                    {/* Email */}
+                    <Field>
+                        <FieldLabel htmlFor="email">Email</FieldLabel>
+                        <Input
+                            id="email"
+                            name="email"
+                            type="email"
+                            placeholder="m@example.com"
+                        //   required
+                        />
+                    </Field>
+
+                    {/* Password */}
+                    <Field className="relative">
+                        <FieldLabel htmlFor="password">Password</FieldLabel>
+                        <Input
+                            id="password"
+                            name="password"
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Enter your password"
+                        //   required
+                        />
+                        <div>
+                            <Button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute bg-transparent hover:bg-transparent inset-y-0 -right-1 mt-8 flex items-center text-gray-500 hover:text-gray-700"
+                            >
+                                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                            </Button>
+                        </div>
+                    </Field>
+                </div>
+                <FieldGroup className="mt-4">
+                    <Field>
+                        <Button type="submit" disabled={isPending}>
+                            {isPending ? "Logging in..." : "Login"}                            
+                        </Button>
+
+                        <FieldDescription className="px-6 text-center">
+                            Don&apos;t have an account?{" "}
+                            <Link href="/register" className="text-blue-600 hover:underline">
+                                Sign up
+                            </Link>
+                        </FieldDescription>
+                        <FieldDescription className="px-6 text-center">
+                            <Link
+                                href="/forget-password"
+                                className="text-blue-600 hover:underline"
+                            >
+                                Forgot password?
+                            </Link>
+                        </FieldDescription>
+                    </Field>
+                </FieldGroup>
+            </FieldGroup>
+        </form>
+    );
+};
+
+export default LoginForm;

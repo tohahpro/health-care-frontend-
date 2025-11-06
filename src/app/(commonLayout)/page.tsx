@@ -1,5 +1,5 @@
 import { Hero } from "@/components/modules/Home/Hero";
-import Specialities from "@/components/modules/Home/Specialties";
+import Specialties from "@/components/modules/Home/Specialties";
 import Steps from "@/components/modules/Home/Steps";
 import Testimonials from "@/components/modules/Home/Testimonials";
 import TopRatedDoctors from "@/components/modules/Home/TopRatedDoctors";
@@ -20,7 +20,7 @@ export default function Home() {
     </Head>
       <main>
         <Hero />
-        <Specialities />
+        <Specialties />
         <TopRatedDoctors />
         <Steps />
         <Testimonials />
