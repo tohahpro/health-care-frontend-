@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use server"
 import z from 'zod'
+import { parse } from 'cookie'
+import { cookies } from 'next/headers'
 
 const loginValidationZodSchema =
     z.object({
@@ -17,6 +19,10 @@ const loginValidationZodSchema =
 
 export const loginUser = async (_currentState: any, formData: any): Promise<any> => {
     try {
+        // step-1
+        let accessTokenObject: null | any = null;
+        let refreshTokenObject: null | any = null;
+
         const loginData = {
             email: formData.get('email'),
             password: formData.get('password')
@@ -41,9 +47,63 @@ export const loginUser = async (_currentState: any, formData: any): Promise<any>
             headers: {
                 "Content-Type": "application/json",
             }
-        }).then(res => res.json())
+        })
 
-        return res;
+        // step-2
+        const result = await res.json()
+
+        // step-3
+        const setCookieHeaders = res.headers.getSetCookie();
+
+        // step-4
+        if (setCookieHeaders && setCookieHeaders.length > 0) {
+            // step-4.1
+            setCookieHeaders.forEach((cookie: string) => {
+
+                // step-4.2 ## use parse in cookie npm package
+                const parsedCookie = parse(cookie);
+
+                // step-4.3 condition check and set cookie
+                if (parsedCookie['accessToken']) {
+                    accessTokenObject = parsedCookie['accessToken']
+                }
+                else if (parsedCookie['refreshToken']) {
+                    refreshTokenObject = parsedCookie['refreshToken']
+                }
+            })
+
+        } else {
+            throw new Error("No Set-Cookie header found")
+        }
+        // step-5
+        if (!accessTokenObject) {
+            throw new Error("Tokens not found in cookies")
+        }
+
+        if (!refreshTokenObject) {
+            throw new Error("Tokens not found in cookies")
+        }
+
+        // step-6 cookies store help by next/headers
+        const cookieStore = await cookies()
+
+        // step-6.1 Token set in cookies
+        cookieStore.set("accessToken", accessTokenObject.accessToken, {
+            secure: true,
+            httpOnly: true,
+            maxAge: parseInt(accessTokenObject.MaxAge),
+            path: accessTokenObject.Path || "/",
+        })
+
+        // step-6.2 Token set in cookies
+        cookieStore.set("refreshToken", refreshTokenObject.accessToken, {
+            secure: true,
+            httpOnly: true,
+            maxAge: parseInt(refreshTokenObject.MaxAge),
+            path: refreshTokenObject.Path || "/",
+        })
+
+        return result;
 
     } catch (error) {
         console.log(error);
