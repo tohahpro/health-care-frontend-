@@ -9,7 +9,7 @@ import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { loginUser } from "@/services/auth/loginUser";
 
-const LoginForm = () => {
+const LoginForm = ({redirect} : {redirect?: string}) => {
 
     const [state, formAction, isPending] = useActionState(loginUser, null);
 
@@ -25,6 +25,9 @@ const LoginForm = () => {
     const [showPassword, setShowPassword] = useState(false)
     return (
         <form action={formAction}>
+            {
+                redirect && <input type="hidden" name="redirect" value={redirect} />
+            }
             <FieldGroup>
                 <div className="grid grid-cols-1 gap-4">
                     {/* Email */}

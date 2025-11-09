@@ -3,6 +3,9 @@
 import z from 'zod'
 import { parse } from 'cookie'
 import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
+import jwt, { JwtPayload } from 'jsonwebtoken'
+import { getDefaultDashboardRoute, isValidRedirectForRole, UserRole } from '@/lib/authUtils'
 
 const loginValidationZodSchema =
     z.object({
@@ -19,6 +22,7 @@ const loginValidationZodSchema =
 
 export const loginUser = async (_currentState: any, formData: any): Promise<any> => {
     try {
+        const redirectTo = formData.get('redirect') || null
         // step-1
         let accessTokenObject: null | any = null;
         let refreshTokenObject: null | any = null;
@@ -50,7 +54,7 @@ export const loginUser = async (_currentState: any, formData: any): Promise<any>
         })
 
         // step-2
-        const result = await res.json()
+        // const result = await res.json()
 
         // step-3
         const setCookieHeaders = res.headers.getSetCookie();
@@ -65,10 +69,10 @@ export const loginUser = async (_currentState: any, formData: any): Promise<any>
 
                 // step-4.3 condition check and set cookie
                 if (parsedCookie['accessToken']) {
-                    accessTokenObject = parsedCookie['accessToken']
+                    accessTokenObject = parsedCookie
                 }
                 else if (parsedCookie['refreshToken']) {
-                    refreshTokenObject = parsedCookie['refreshToken']
+                    refreshTokenObject = parsedCookie
                 }
             })
 
@@ -91,21 +95,42 @@ export const loginUser = async (_currentState: any, formData: any): Promise<any>
         cookieStore.set("accessToken", accessTokenObject.accessToken, {
             secure: true,
             httpOnly: true,
-            maxAge: parseInt(accessTokenObject.MaxAge),
+            maxAge: parseInt(accessTokenObject['Max-Age']) || 1000 * 60 * 60,
             path: accessTokenObject.Path || "/",
+            sameSite: refreshTokenObject['SameSite']
         })
 
         // step-6.2 Token set in cookies
-        cookieStore.set("refreshToken", refreshTokenObject.accessToken, {
+        cookieStore.set("refreshToken", refreshTokenObject.refreshToken, {
             secure: true,
             httpOnly: true,
-            maxAge: parseInt(refreshTokenObject.MaxAge),
+            maxAge: parseInt(refreshTokenObject['Max-Age']) || 1000 * 60 * 60 * 24 * 90,
             path: refreshTokenObject.Path || "/",
+            sameSite: refreshTokenObject['SameSite']
         })
 
-        return result;
 
-    } catch (error) {
+        const verifiedToken: JwtPayload | string = jwt.verify(accessTokenObject.accessToken, process.env.JWT_ACCESS_SECRET as string)
+
+        if (typeof verifiedToken === "string") { // string return when token return error
+            throw new Error("Invalid Token")
+        }
+
+        const userRole: any = verifiedToken.role;
+
+        if (redirectTo) {
+            const requestedPath = redirectTo.toString();
+            if (isValidRedirectForRole(requestedPath, userRole)) {
+                redirect(requestedPath);
+            } else {
+                redirect(getDefaultDashboardRoute(userRole));
+            }
+        }
+
+    } catch (error: any) {
+        if (error?.digest?.startsWith('NEXT_REDIRECT')) {
+            throw error;
+        }
         console.log(error);
         return { error: "Login failed" }
     }
