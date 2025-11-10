@@ -5,7 +5,7 @@ import { parse } from 'cookie'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import jwt, { JwtPayload } from 'jsonwebtoken'
-import { getDefaultDashboardRoute, isValidRedirectForRole, UserRole } from '@/lib/authUtils'
+import { getDefaultDashboardRoute, isValidRedirectForRole } from '@/lib/authUtils'
 
 const loginValidationZodSchema =
     z.object({
@@ -52,6 +52,8 @@ export const loginUser = async (_currentState: any, formData: any): Promise<any>
                 "Content-Type": "application/json",
             }
         })
+
+        const result = await res.json()
 
         // step-2
         // const result = await res.json()
@@ -118,6 +120,10 @@ export const loginUser = async (_currentState: any, formData: any): Promise<any>
 
         const userRole: any = verifiedToken.role;
 
+        if(!result.success){
+            throw new Error("Login failed")
+        }
+
         if (redirectTo) {
             const requestedPath = redirectTo.toString();
             if (isValidRedirectForRole(requestedPath, userRole)) {
@@ -125,6 +131,8 @@ export const loginUser = async (_currentState: any, formData: any): Promise<any>
             } else {
                 redirect(getDefaultDashboardRoute(userRole));
             }
+        } else {
+            getDefaultDashboardRoute(userRole)
         }
 
     } catch (error: any) {
