@@ -6,6 +6,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import { getDefaultDashboardRoute, isValidRedirectForRole } from '@/lib/authUtils'
+import { setCookie } from './tokenHandlers'
 
 const loginValidationZodSchema =
     z.object({
@@ -91,10 +92,10 @@ export const loginUser = async (_currentState: any, formData: any): Promise<any>
         }
 
         // step-6 cookies store help by next/headers
-        const cookieStore = await cookies()
+        // const cookieStore = await cookies()
 
         // step-6.1 Token set in cookies
-        cookieStore.set("accessToken", accessTokenObject.accessToken, {
+        setCookie("accessToken", accessTokenObject.accessToken, {
             secure: true,
             httpOnly: true,
             maxAge: parseInt(accessTokenObject['Max-Age']) || 1000 * 60 * 60,
@@ -103,7 +104,7 @@ export const loginUser = async (_currentState: any, formData: any): Promise<any>
         })
 
         // step-6.2 Token set in cookies
-        cookieStore.set("refreshToken", refreshTokenObject.refreshToken, {
+        setCookie("refreshToken", refreshTokenObject.refreshToken, {
             secure: true,
             httpOnly: true,
             maxAge: parseInt(refreshTokenObject['Max-Age']) || 1000 * 60 * 60 * 24 * 90,
