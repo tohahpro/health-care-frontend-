@@ -2,7 +2,6 @@
 "use server"
 import z from 'zod'
 import { parse } from 'cookie'
-import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import { getDefaultDashboardRoute, isValidRedirectForRole } from '@/lib/authUtils'
@@ -95,7 +94,7 @@ export const loginUser = async (_currentState: any, formData: any): Promise<any>
         // const cookieStore = await cookies()
 
         // step-6.1 Token set in cookies
-        setCookie("accessToken", accessTokenObject.accessToken, {
+        await setCookie("accessToken", accessTokenObject.accessToken, {
             secure: true,
             httpOnly: true,
             maxAge: parseInt(accessTokenObject['Max-Age']) || 1000 * 60 * 60,
@@ -104,7 +103,7 @@ export const loginUser = async (_currentState: any, formData: any): Promise<any>
         })
 
         // step-6.2 Token set in cookies
-        setCookie("refreshToken", refreshTokenObject.refreshToken, {
+        await setCookie("refreshToken", refreshTokenObject.refreshToken, {
             secure: true,
             httpOnly: true,
             maxAge: parseInt(refreshTokenObject['Max-Age']) || 1000 * 60 * 60 * 24 * 90,
