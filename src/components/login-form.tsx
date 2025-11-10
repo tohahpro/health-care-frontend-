@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "./ui/field";
 import { Input } from "./ui/input";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { loginUser } from "@/services/auth/loginUser";
+import { toast } from "sonner";
 
 const LoginForm = ({redirect} : {redirect?: string}) => {
 
@@ -21,6 +22,12 @@ const LoginForm = ({redirect} : {redirect?: string}) => {
             return null;
         }
     }
+
+    useEffect(()=>{
+        if(state && !state.success && state.message){
+            toast.error(state.message)
+        }
+    }, [state])
 
     const [showPassword, setShowPassword] = useState(false)
     return (
