@@ -9,7 +9,7 @@ type RouteConfig = {
 const authRoutes = ["/login", "/register", "/forgot-password", "/reset-password"];
 
 const commonProtectedRoutes: RouteConfig = {
-    exact: ["/my-profile", "/settings"],
+    exact: ["/my-profile", "/settings", "/change-password"],
     patterns: []
 }
 
