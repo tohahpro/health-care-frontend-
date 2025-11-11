@@ -1,15 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { FieldGroup, Field, FieldDescription, FieldLabel } from "./ui/field";
 import { Input } from "./ui/input";
 import Link from "next/link";
 import { registerPatient } from "@/services/auth/registerPatient";
 import { Eye, EyeOff } from "lucide-react";
+import { toast } from "sonner";
 
 const RegisterForm = () => {
+
+    const [showPassword, setShowPassword] = useState(false)
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+    const [state, formAction, isPending] = useActionState(registerPatient, null)
+    console.log(state);
 
     const getFieldError = (fieldName: string) => {
         if (state && state.errors) {
@@ -24,10 +30,12 @@ const RegisterForm = () => {
         }
     }
 
-    const [showPassword, setShowPassword] = useState(false)
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-    const [state, formAction, isPending] = useActionState(registerPatient, null)
-    console.log(state);
+    useEffect(() => {
+        if (state && !state.success && state.message) {
+            toast.error(state.message)
+        }
+    }, [state])
+
     return (
         <form action={formAction}>
             <FieldGroup>

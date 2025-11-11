@@ -129,10 +129,10 @@ export const loginUser = async (_currentState: any, formData: any): Promise<any>
             if (isValidRedirectForRole(requestedPath, userRole)) {
                 redirect(requestedPath);
             } else {
-                redirect(getDefaultDashboardRoute(userRole));
+                redirect(`${getDefaultDashboardRoute(userRole)}?loggedIn=true`);
             }
         } else {
-            getDefaultDashboardRoute(userRole)
+            redirect(`${getDefaultDashboardRoute(userRole)}?loggedIn=true`);
         }
 
     } catch (error: any) {
