@@ -7,7 +7,7 @@ import { SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { NavSection } from "@/types/dashboard.interface";
 import { UserInfo } from "@/types/user.interface";
-import { Bell } from "lucide-react";
+import { getIconComponent } from "@/lib/icon-mapper";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -48,7 +48,7 @@ const DashboardMobileSidebar = ({
                             <div className="space-y-1">
                                 {section.items.map((item) => {
                                     const isActive = pathname === item.href;
-                                    // const Icon = getIconComponent(item.icon);
+                                    const Icon = getIconComponent(item.icon);
                                     
 
                                     return (
@@ -62,8 +62,7 @@ const DashboardMobileSidebar = ({
                                                     : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                                             )}
                                         >
-                                            {/* <Icon className="h-4 w-4" /> */}
-                                            <Bell/>
+                                            <Icon className="h-4 w-4" />                                            
                                             <span className="flex-1">{item.title}</span>
                                             {item.badge && (
                                                 <Badge variant={isActive ? "secondary" : "default"}>
