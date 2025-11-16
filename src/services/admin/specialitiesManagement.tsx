@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client"
+"use server"
 
 import { serverFetch } from "@/lib/server-fetch"
 import { zodValidator } from "@/lib/zodValidator"
@@ -60,7 +60,7 @@ export async function createSpeaciality(_prevState: any, formData: FormData) {
 }
 
 
-export async function getSpeaciality() {
+export async function getSpeacialities() {
     try {
         const response = await serverFetch.get("/specialties")
         const result = await response.json();
@@ -74,4 +74,16 @@ export async function getSpeaciality() {
     }
 }
 
-export async function deleteSpeaciality(id: string) { }
+export async function deleteSpeciality(id: string) {
+    try {
+        const response = await serverFetch.delete(`/specialties/${id}`)
+        const result = await response.json();
+        return result;
+    } catch (error: any) {
+        console.log(error);
+        return {
+            success: false,
+            message: `${process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'}`
+        };
+    }
+}

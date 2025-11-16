@@ -141,7 +141,7 @@ export const adminNavItems: NavSection[] = [
             },
             {
                 title: "Specialities",
-                href: "/admin/dashboard/specialities-management",
+                href: "/admin/dashboard/spcecialities-management",
                 icon: "Hospital", 
                 roles: ['Admin'],
             },
