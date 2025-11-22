@@ -1,3 +1,4 @@
+"use client"
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTransition } from "react";
 import {
@@ -52,7 +53,7 @@ const SelectFilter = ({
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="All">All</SelectItem>
-        {options.map((option) => (
+        {options?.map((option) => (
           <SelectItem key={option.value} value={option.value}>
             {option.label}
           </SelectItem>
