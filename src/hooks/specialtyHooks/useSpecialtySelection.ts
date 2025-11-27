@@ -31,9 +31,9 @@ export const useSpecialtySelection = ({
             return (
                 doctor?.doctorSpecialties
                     ?.map((ds) => {
-                        // Try: specialitiesId, specialities?.id, or specialties.id
+                        // Try: specialitiesId, specialities.id, or specialties.id
                         return (
-                            ds?.specialties?.id || null
+                            ds?.specialitiesId || null
                         );
                     })
                     ?.filter((id): id is string => !!id) || []
@@ -76,7 +76,7 @@ export const useSpecialtySelection = ({
         if (isEdit && doctor?.doctorSpecialties) {
             const wasOriginalSpecialty = doctor?.doctorSpecialties?.some((ds) => {
                 const id =
-                    ds?.specialties?.id || null
+                    ds?.specialitiesId || null
                 return id === specialtyId;
             });
             if (wasOriginalSpecialty && !removedSpecialtyIds.includes(specialtyId)) {
@@ -92,7 +92,7 @@ export const useSpecialtySelection = ({
         const originalIds =
             doctor?.doctorSpecialties
                 ?.map(
-                    (ds) => ds?.specialties?.id || null
+                    (ds) => ds?.specialitiesId || null
                 )
                 ?.filter((id): id is string => !!id) || [];
         return selectedSpecialtyIds.filter((id) => !originalIds.includes(id));
