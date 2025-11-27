@@ -20,7 +20,6 @@ interface UserDropdownProps {
 }
 
 const UserDropdown = ({ userInfo }: UserDropdownProps) => {
-  console.log(userInfo);
     const handleLogout = async () => {
     await logoutUser();
   };

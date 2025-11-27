@@ -20,7 +20,7 @@ const DoctorsManagementHeader = ({
 
     const [, startTransition] = useTransition();
 
-    const [isDialogOpen, serIsDialogOpen] = useState(false);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     const handleSuccess = () =>{
         startTransition(()=>{
@@ -28,12 +28,22 @@ const DoctorsManagementHeader = ({
         })
     }
 
+    const [dialogKey, setDialogKey] = useState(0);
+    const handleOpenDialog = () =>{
+        setDialogKey(prev => prev + 1);
+        setIsDialogOpen(true);
+    }
+    
+    const handleCloseDialog = () =>{
+        setIsDialogOpen(false);
+    }
 
     return (
         <div>
-            <DoctorFormDialog 
+            <DoctorFormDialog
+            key={dialogKey}
             open={isDialogOpen}
-            onClose={()=> serIsDialogOpen(false)}
+            onClose={handleCloseDialog}            
             onSuccess={handleSuccess}
             specialities={specialities}
             />
@@ -44,7 +54,7 @@ const DoctorsManagementHeader = ({
             action={{
                 label: "Add Doctor",
                 icon: Plus,
-                onClick: ()=> serIsDialogOpen(true)
+                onClick: handleOpenDialog
             }}
             />
         </div>
