@@ -61,13 +61,12 @@ export async function proxy(request: NextRequest) {
 
   // Rule 4: User is trying to access protected route
   if(routeOwner === 'Admin' || routeOwner === 'Doctor' || routeOwner === 'Patient'){
-    if(userRole === routeOwner){
-        new URL(getDefaultDashboardRoute(userRole as UserRole), request.url);
+    if(userRole !== routeOwner){
+        return NextResponse.redirect(new URL(getDefaultDashboardRoute(userRole as UserRole), request.url));
     }
     return NextResponse.next();
   }
 
-  return NextResponse.next();
 }
 
 export const config = {
