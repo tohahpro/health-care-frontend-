@@ -13,6 +13,7 @@ import {
 interface SelectFilterProps {
   paramName: string; // ?gender=
   placeholder?: string;
+  defaultValue?: string;
   options: { label: string; value: string }[];
 }
 
@@ -20,6 +21,7 @@ const SelectFilter = ({
   paramName,
   placeholder,
   options,
+  defaultValue = "All",
 }: SelectFilterProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -48,11 +50,11 @@ const SelectFilter = ({
       onValueChange={handleChange}
       disabled={isPending}
     >
-      <SelectTrigger>
+      <SelectTrigger className="w-[140px] h-10">
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="All">All</SelectItem>
+        <SelectItem value={defaultValue}>{defaultValue}</SelectItem>
         {options?.map((option) => (
           <SelectItem key={option.value} value={option.value}>
             {option.label}
