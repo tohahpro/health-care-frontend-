@@ -1,3 +1,4 @@
+import SchedulesFilter from "@/components/modules/Admin/SchedulesManagement/SchedulesFilter";
 import SchedulesManagementHeader from "@/components/modules/Admin/SchedulesManagement/SchedulesManagementHeader";
 import SchedulesTable from "@/components/modules/Admin/SchedulesManagement/SchedulesTable";
 import TablePagination from "@/components/shared/TablePagination";
@@ -16,7 +17,7 @@ const SchedulesManagementPage = async ({
 
     const queryString = queryStringFormatter(searchParamsObj);
     const schedulesResult = await getSchedules(queryString);
-console.log(schedulesResult)
+
     const totalPages = Math.ceil(
         (schedulesResult?.meta?.total || 1) / (schedulesResult?.meta?.limit || 1)
     );
@@ -25,6 +26,8 @@ console.log(schedulesResult)
         <>
             <div className="space-y-6">
                 <SchedulesManagementHeader />
+
+                <SchedulesFilter />
 
                 <Suspense fallback={<TableSkeleton columns={4} rows={10} />}>
                     <SchedulesTable schedules={schedulesResult?.data || []} />
