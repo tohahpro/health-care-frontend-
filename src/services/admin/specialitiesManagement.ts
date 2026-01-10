@@ -62,7 +62,10 @@ export async function createSpeaciality(_prevState: any, formData: FormData) {
 
 export async function getSpeacialities() {
     try {
-        const response = await serverFetch.get("/specialties")
+        const response = await serverFetch.get("/specialties", {
+            cache: "force-cache",
+            next: { tags: ["specialities-list"]}
+        })
         const result = await response.json();
         return result;
     } catch (error: any) {
