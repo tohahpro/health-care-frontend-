@@ -103,6 +103,10 @@ export async function resetPassword(_prevState: any, formData: FormData) {
             throw new Error(result.message || "Reset password failed");
         }
 
+        if(result.success){
+            revalidateTag("user-info", "max")
+        }
+
         if (result.success) {
             // await get
             revalidateTag("user-info", { expire: 0 });

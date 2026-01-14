@@ -6,7 +6,7 @@ type RouteConfig = {
     patterns: RegExp[],
 }
 
-const authRoutes = ["/login", "/register", "/forgot-password", "/reset-password"];
+const authRoutes = ["/login", "/register", "/forgot-password"];
 
 const commonProtectedRoutes: RouteConfig = {
     exact: ["/my-profile", "/settings", "/change-password"],

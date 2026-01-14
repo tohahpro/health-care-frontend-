@@ -124,12 +124,12 @@ export const loginUser = async (_currentState: any, formData: any): Promise<any>
             throw new Error(result.message || "Login failed")
         }
 
-        if(result?.data?.needPasswordChange){
+        if(result?.needPasswordChange){
             redirect(`/reset-password`);            
         }
         
 
-        if (redirectTo && result.data.needPasswordChange) {
+        if (redirectTo && result.needPasswordChange) {
             const requestedPath = redirectTo.toString();
             if (isValidRedirectForRole(requestedPath, userRole)) {
                 redirect(`/reset-password?redirect=${requestedPath}`);
