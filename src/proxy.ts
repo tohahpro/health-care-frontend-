@@ -7,26 +7,43 @@ import {
   isAuthRoute,
   UserRole,
 } from "./lib/authUtils";
-import { cookies } from "next/headers";
 import { getUserInfo } from "./services/auth/getUserInfo";
+import { getNewAccessToken } from "./services/auth/auth.service";
+import { deleteCookie, getCookie } from "./services/auth/tokenHandlers";
 
 // This function can be marked `async` if using `await` inside
 export async function proxy(request: NextRequest) {
-  const cookieStore = await cookies();
+
   const pathname = request.nextUrl.pathname;
 
-  const accessToken = request.cookies.get("accessToken")?.value || null;
+  const hasTokenRefreshedParam = request.nextUrl.searchParams.has('tokenRefreshed');
+
+  // If coming back after token refresh, remove the param and continue
+  if (hasTokenRefreshedParam) {
+    const url = request.nextUrl.clone();
+    url.searchParams.delete('tokenRefreshed');
+    return NextResponse.redirect(url);
+  }
+
+  const tokenRefreshResult = await getNewAccessToken();
+
+  // If token was refreshed, redirect to same page to fetch with new token
+  if (tokenRefreshResult?.tokenRefreshed) {
+    const url = request.nextUrl.clone();
+    url.searchParams.set('tokenRefreshed', 'true');
+    return NextResponse.redirect(url);
+  }
+
+
+  const accessToken = await getCookie("accessToken") || null;
 
   let userRole: UserRole | null = null;
   if (accessToken) {
-    const verifiedToken: string | JwtPayload = jwt.verify(
-      accessToken,
-      process.env.JWT_ACCESS_SECRET as string
-    );
+    const verifiedToken: JwtPayload | string = jwt.verify(accessToken, process.env.JWT_ACCESS_SECRET as string);
 
     if (typeof verifiedToken === "string") {
-      cookieStore.delete("accessToken");
-      cookieStore.delete("refreshToken");
+      await deleteCookie("accessToken");
+      await deleteCookie("refreshToken");
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
@@ -69,7 +86,7 @@ export async function proxy(request: NextRequest) {
       return NextResponse.next();
     }
 
-    if(userInfo && !userInfo.needPasswordChange && pathname === '/reset-password'){
+    if (userInfo && !userInfo.needPasswordChange && pathname === '/reset-password') {
       return NextResponse.redirect(new URL(getDefaultDashboardRoute(userRole as UserRole), request.url));
     }
   }

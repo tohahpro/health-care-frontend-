@@ -9,7 +9,7 @@ type RouteConfig = {
 const authRoutes = ["/login", "/register", "/forgot-password"];
 
 const commonProtectedRoutes: RouteConfig = {
-    exact: ["/my-profile", "/settings", "/change-password"],
+    exact: ["/my-profile", "/settings", "/change-password", "/reset-password"],
     patterns: []
 }
 
@@ -61,7 +61,7 @@ export const getRouteOwner = (pathname: string): "Admin" | "Doctor" | "Patient" 
 
 export const getDefaultDashboardRoute = (role: UserRole): string => {
     if (role === "Admin") {
-        return "/admin/dashboard/doctors-management"
+        return "/admin/dashboard"
     }
     if (role === "Doctor") {
         return "/doctor/dashboard"

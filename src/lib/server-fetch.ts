@@ -10,9 +10,9 @@ export const serverFetchHelper = async(endpoint: string, options: RequestInit) :
 
     const response = fetch(`${BACKEND_API_URL}${endpoint}`,{
         headers: {
+            Cookie: accessToken ? `accessToken=${accessToken}` : "",
             ...headers,
             // ...(accessToken ? {"Authorization" : `accessToken`}: {})
-            Cookie: accessToken ? `accessToken=${accessToken}` : "",
         },
         ...restOptions
     })
