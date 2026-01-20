@@ -1,3 +1,4 @@
+import { getNewAccessToken } from "@/services/auth/auth.service";
 import { getCookie } from "@/services/auth/tokenHandlers";
 
 const BACKEND_API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -7,6 +8,10 @@ export const serverFetchHelper = async(endpoint: string, options: RequestInit) :
     const {headers, ...restOptions} = options;
     
     const accessToken = await getCookie("accessToken");
+
+    if(endpoint !== "/auth/refresh-token"){
+        await getNewAccessToken();
+    }
 
     const response = fetch(`${BACKEND_API_URL}${endpoint}`,{
         headers: {
