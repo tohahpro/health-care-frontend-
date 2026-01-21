@@ -1,15 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+"use server"
 import { serverFetch } from "@/lib/server-fetch";
 
 
 // Get Doctor Schedules
-export async function getDoctorSchedules(queryString?: string) {
+export async function getDoctorOwnSchedules(queryString?: string) {
     try {
         const response = await serverFetch.get(`/doctor-schedule/my-schedule${queryString ? `?${queryString}` : ''}`);
         const result = await response.json();
         return {
             success: result.success,
-            data: Array.isArray(result.data) ? result.data : [],
+            data:  result.data,     
             meta: result.meta,
         };
 
