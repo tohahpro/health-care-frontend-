@@ -1,5 +1,7 @@
 import { IDoctor } from "./doctor.interface";
 import { IPatient } from "./patient.interface";
+import { IPrescription } from "./prescription.interface";
+import { IReview } from "./review.interface";
 import { ISchedule } from "./schedule.interface";
 
 export enum AppointmentStatus {
@@ -27,4 +29,11 @@ export interface IAppointment {
     patient?: IPatient;
     doctor?: IDoctor;
     schedule?: ISchedule;
+    prescription?: IPrescription;
+    review?: IReview;
+}
+
+export interface IAppointmentFormData {
+    doctorId: string;
+    scheduleId: string;
 }
