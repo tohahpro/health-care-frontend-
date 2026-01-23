@@ -5,15 +5,15 @@ import { IReview } from "./review.interface";
 import { ISchedule } from "./schedule.interface";
 
 export enum AppointmentStatus {
-    SCHEDULED = "SCHEDULED",
-    INPROGRESS = "INPROGRESS",
-    COMPLETED = "COMPLETED",
-    CANCELED = "CANCELED",
+    SCHEDULED = "SCHEDULE",
+    INPROGRESS = "InProgress",
+    COMPLETED = "Completed",
+    CANCELED = "Cancelled",
 }
 
 export enum PaymentStatus {
-    PAID = "PAID",
-    UNPAID = "UNPAID",
+    PAID = "Paid",
+    UNPAID = "Unpaid",
 }
 
 export interface IAppointment {

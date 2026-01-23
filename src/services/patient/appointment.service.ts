@@ -29,7 +29,7 @@ export async function createAppointment(data: IAppointmentFormData) {
 export async function getMyAppointments(queryString?: string) {
     try {
         const response = await serverFetch.get(
-            `/appointment/my-appointment${queryString ? `?${queryString}` : "?sortBy=createdAt&sortOrder=desc"}`
+            `/appointment/my-appointments${queryString ? `?${queryString}` : "?sortBy=createdAt&sortOrder=desc"}`
         );
         const result = await response.json();
         console.log({ result });
