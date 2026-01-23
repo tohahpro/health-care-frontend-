@@ -14,7 +14,7 @@ const commonProtectedRoutes: RouteConfig = {
 }
 
 const doctorProtectedRoutes: RouteConfig = {
-    patterns: [/^\/doctor/, /^\/appointments/],
+    patterns: [/^\/doctor/],
     exact: []
 }
 
