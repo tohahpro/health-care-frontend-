@@ -18,10 +18,13 @@ import {
   User,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+// import ReviewDialog from "./ReviewDialog";
 import {
   AppointmentStatus,
   IAppointment,
 } from "@/types/appointments.interface";
+import ReviewDialog from "./ReviewDialog";
 
 interface AppointmentDetailProps {
   appointment: IAppointment;
@@ -29,9 +32,10 @@ interface AppointmentDetailProps {
 
 const AppointmentDetails = ({ appointment }: AppointmentDetailProps) => {
   const router = useRouter();
+  const [showReviewDialog, setShowReviewDialog] = useState(false);
 
   const isCompleted = appointment.status === AppointmentStatus.COMPLETED;
-
+  const canReview = isCompleted && !appointment.review;
 
   const getStatusBadge = (status: AppointmentStatus) => {
     const statusConfig: Record<
@@ -81,6 +85,33 @@ const AppointmentDetails = ({ appointment }: AppointmentDetailProps) => {
           Back
         </Button>
       </div>
+
+      {/* Review Notification - Only show if can review (completed but no review) */}
+      {canReview && (
+        <Card className="border-amber-200 bg-amber-50">
+          <CardContent className="pt-6">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5" />
+              <div className="flex-1">
+                <h3 className="font-semibold text-amber-900">
+                  Review This Appointment
+                </h3>
+                <p className="text-sm text-amber-700 mt-1">
+                  Your appointment has been completed. Share your experience by
+                  leaving a review for Dr. {appointment.doctor?.name}.
+                </p>
+                <Button
+                  onClick={() => setShowReviewDialog(true)}
+                  className="mt-3"
+                  size="sm"
+                >
+                  Write a Review
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Cannot Review Yet - Only show if not completed and no review */}
       {!isCompleted && !appointment.review && (
@@ -359,6 +390,16 @@ const AppointmentDetails = ({ appointment }: AppointmentDetailProps) => {
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* Review Dialog */}
+      {canReview && (
+        <ReviewDialog
+          isOpen={showReviewDialog}
+          onClose={() => setShowReviewDialog(false)}
+          appointmentId={appointment.id}
+          doctorName={appointment.doctor?.name || "the doctor"}
+        />
       )}
     </div>
   );
