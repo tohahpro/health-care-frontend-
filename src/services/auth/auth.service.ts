@@ -106,7 +106,7 @@ export async function resetPassword(_prevState: any, formData: FormData) {
         }
 
         if (result.success) {
-            revalidateTag("user-info", "max")
+            revalidateTag("user-info", {expire: 0});
         }
 
         if (result.success) {
@@ -182,8 +182,6 @@ export async function getNewAccessToken() {
         });
 
         const result = await response.json();
-
-        console.log("access token refreshed")
 
         const setCookieHeaders = response.headers.getSetCookie();
         // console.log("setCookieHeaders", setCookieHeaders);

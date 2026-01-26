@@ -3,6 +3,7 @@
 
 import { serverFetch } from "@/lib/server-fetch"
 import { zodValidator } from "@/lib/zodValidator"
+import { revalidateTag } from "next/cache"
 import z from "zod"
 
 
@@ -48,6 +49,9 @@ export async function createSpeaciality(_prevState: any, formData: FormData) {
         })
 
         const result = await response.json();
+        if(result.success){
+            revalidateTag('spcialities-list', { expire: 0})
+        }
         return result;
 
     } catch (error: any) {
@@ -64,7 +68,10 @@ export async function getSpeacialities() {
     try {
         const response = await serverFetch.get("/specialties", {
             cache: "force-cache",
-            next: { tags: ["specialities-list"]}
+            next: { 
+                tags: ["specialities-list"],
+                revalidate: 600
+            }
         })
         const result = await response.json();
         return result;
@@ -81,6 +88,11 @@ export async function deleteSpeciality(id: string) {
     try {
         const response = await serverFetch.delete(`/specialties/${id}`)
         const result = await response.json();
+         if (result.success) {
+            revalidateTag('specialities-list', { expire: 0 });
+            revalidateTag(`specialty-${id}`, { expire: 0 });
+            revalidateTag('doctors-list', { expire: 0 }); // Doctors have 
+        }
         return result;
     } catch (error: any) {
         console.log(error);

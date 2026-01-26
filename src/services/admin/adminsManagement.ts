@@ -4,9 +4,10 @@
 import { serverFetch } from "@/lib/server-fetch";
 import { zodValidator } from "@/lib/zodValidator";
 import { createAdminZodSchema, updateAdminZodSchema } from "@/zod/admin.validation";
+import { revalidateTag } from "next/cache";
 
 
- /* CREATE ADMIN API: POST /user/create-admin */
+/* CREATE ADMIN API: POST /user/create-admin */
 export async function createAdmin(_prevState: any, formData: FormData) {
     // Build validation payload
     const validationPayload = {
@@ -49,12 +50,16 @@ export async function createAdmin(_prevState: any, formData: FormData) {
     newFormData.append("file", formData.get("file") as Blob)
     try {
 
-
         const response = await serverFetch.post("/user/create-admin", {
             body: newFormData,
         });
 
         const result = await response.json();
+        if (result.success) {
+            revalidateTag('admins-list', { expire: 0 });
+            revalidateTag('admins-page-1', { expire: 0 });
+            revalidateTag('admins-dashboard-meta', { expire: 0 });
+        }
         return result;
     } catch (error: any) {
         console.error("Create admin error:", error);
@@ -69,7 +74,19 @@ export async function createAdmin(_prevState: any, formData: FormData) {
 /* GET ALL ADMINS API: GET /admin?queryParams */
 export async function getAdmins(queryString?: string) {
     try {
-        const response = await serverFetch.get(`/admin${queryString ? `?${queryString}` : ""}`);
+        const searchParams = new URLSearchParams(queryString);
+        const page = searchParams.get("page") || "1";
+        const searchTearm = searchParams.get("searchTearm") || "all";
+        const response = await serverFetch.get(`/admin${queryString ? `?${queryString}` : ""}`, {
+            next: {
+                tags: [
+                    'admins-list',
+                    `admin-page-${page}`,
+                    `admin-search-${searchTearm}`
+                ],
+                revalidate: 180
+            }
+        });
         const result = await response.json();
         return result;
     } catch (error: any) {
@@ -84,7 +101,12 @@ export async function getAdmins(queryString?: string) {
 /** GET ADMIN BY ID  API: GET /admin/:id */
 export async function getAdminById(id: string) {
     try {
-        const response = await serverFetch.get(`/admin/${id}`)
+        const response = await serverFetch.get(`/admin/${id}`, {
+            next: {
+                tags: [`admin-${id}`, 'admins-list'],
+                revalidate: 180
+            }
+        });
         const result = await response.json();
         return result;
     } catch (error: any) {
@@ -130,6 +152,11 @@ export async function updateAdmin(id: string, _prevState: any, formData: FormDat
         });
 
         const result = await response.json();
+        if (result.success) {
+            revalidateTag('admins-list', { expire: 0 });
+            revalidateTag('admins-page-1', { expire: 0 });
+            revalidateTag('admins-dashboard-meta', { expire: 0 });
+        }
         return result;
     } catch (error: any) {
         console.error("Update admin error:", error);
@@ -149,6 +176,11 @@ export async function softDeleteAdmin(id: string) {
     try {
         const response = await serverFetch.delete(`/admin/soft/${id}`)
         const result = await response.json();
+        if (result.success) {
+            revalidateTag('admins-list', { expire: 0 });
+            revalidateTag('admins-page-1', { expire: 0 });
+            revalidateTag('admins-dashboard-meta', { expire: 0 });
+        }
         return result;
     } catch (error: any) {
         console.log(error);
