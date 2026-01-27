@@ -68,15 +68,13 @@ export async function getMyAppointments(queryString?: string) {
     try {
         const response = await serverFetch.get(
             `/appointment/my-appointments${queryString ? `?${queryString}` : "?sortBy=createdAt&sortOrder=desc"}`
-        );
+        ,{
+            next: {
+                tags: ['my-appointments'],
+                revalidate: 30
+            }
+        });
         const result = await response.json();
-        if (result.success) {
-            revalidateTag('my-appointments', { expire: 0 });
-            revalidateTag('appointments-list', { expire: 0 });
-            revalidateTag('patient-dashboard-meta', { expire: 0 });
-            revalidateTag('admin-dashboard-meta', { expire: 0 });
-            revalidateTag('doctor-dashboard-meta', { expire: 0 });
-        }
         return result;
     } catch (error: any) {
         console.error("Error fetching appointments:", error);
