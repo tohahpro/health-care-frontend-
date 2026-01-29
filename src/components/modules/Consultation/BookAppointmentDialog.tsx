@@ -65,6 +65,7 @@ export default function BookAppointmentDialog({
   const hasSchedulesWithoutData =
     doctorSchedules.length > 0 && groupedSchedules.length === 0;
 
+    console.log(groupedSchedules)
 
   const handleContinue = () => {
     if (selectedSchedule) {
@@ -130,7 +131,9 @@ export default function BookAppointmentDialog({
                       </div>
 
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                        {dateSchedules.map((schedule) => {
+                        {dateSchedules
+                        .filter((schedule) => schedule.isBooked === false)
+                        .map((schedule) => {
                           const startTime = schedule.schedule?.startDateTime
                             ? new Date(schedule.schedule.startDateTime)
                             : null;

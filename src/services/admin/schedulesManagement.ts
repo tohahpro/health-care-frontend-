@@ -73,9 +73,8 @@ export async function getSchedules(queryString?: string) {
                     "schedules-list",
                     `schedules-page-${page}`,
                     `schedules-search-${searchTerm}`,
-                ],
-                // Reduced to 120s for more frequent updates on schedules
-                revalidate: 120,
+                ],                
+                revalidate: 10,
             },
         });
         const result = await response.json();
