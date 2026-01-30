@@ -98,7 +98,7 @@ const LoginForm = ({redirect} : {redirect?: string}) => {
                         </FieldDescription>
                         <FieldDescription className="px-6 text-center">
                             <Link
-                                href="/forget-password"
+                                href="/forgot-password"
                                 className="text-blue-600 hover:underline"
                             >
                                 Forgot password?
