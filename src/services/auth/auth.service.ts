@@ -1,11 +1,8 @@
 "use server";
-import { getDefaultDashboardRoute, isValidRedirectForRole, UserRole } from "@/lib/authUtils";
 import { serverFetch } from "@/lib/server-fetch";
 import { zodValidator } from "@/lib/zodValidator";
 import jwt from "jsonwebtoken";
 import { revalidateTag } from "next/cache";
-import { redirect } from "next/navigation";
-import { getUserInfo } from "./getUserInfo";
 import { deleteCookie, getCookie, setCookie, } from "./tokenHandlers";
 import { changePasswordSchema, forgotPasswordSchema, resetPasswordSchema } from "@/zod/auth.validation";
 import { verifyAccessToken } from "@/lib/jwtHandlers";
@@ -53,9 +50,10 @@ export async function updateMyProfile(formData: FormData) {
 
 // Reset Password
 export async function resetPassword(_prevState: any, formData: FormData) {
-
-    const redirectTo = formData.get('redirect') || null;
-
+    const isEmailReset = formData.get("isEmailReset") === "true";
+    const email = formData.get("email") as string;
+    const token = formData.get("token") as string;
+    
     // Build validation payload
     const validationPayload = {
         newPassword: formData.get("newPassword") as string,
@@ -63,7 +61,10 @@ export async function resetPassword(_prevState: any, formData: FormData) {
     };
 
     // Validate
-    const validatedPayload = zodValidator(validationPayload, resetPasswordSchema);
+    const validatedPayload = zodValidator(
+        validationPayload,
+        resetPasswordSchema
+    );
 
     if (!validatedPayload.success && validatedPayload.errors) {
         return {
@@ -76,60 +77,58 @@ export async function resetPassword(_prevState: any, formData: FormData) {
 
     try {
 
-        const accessToken = await getCookie("accessToken");
-
-        if (!accessToken) {
-            throw new Error("User not authenticated");
+        if (token) {
+            jwt.verify(token, process.env.RESET_PASS_TOKEN as string);
         }
 
-        const verifiedToken = jwt.verify(accessToken as string, process.env.JWT_ACCESS_SECRET!) as jwt.JwtPayload;
+        let response;
 
-        const userRole: UserRole = verifiedToken.role;
+        if (isEmailReset) {
+            // Case 1: Password reset from email link (with token)
+            if (!email || !token) {
+                return {
+                    success: false,
+                    message: "Invalid reset link",
+                };
+            }
 
-        const user = await getUserInfo();
-        // API Call
-        const response = await serverFetch.post("/auth/reset-password", {
-            body: JSON.stringify({
-                id: user?.id,
-                password: validationPayload.newPassword,
-            }),
-            headers: {
-                "Authorization": accessToken,
-                "Content-Type": "application/json",
-            },
-        });
+            response = await serverFetch.post("/auth/reset-password", {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: validationPayload.newPassword,
+                }),
+            });
+        } else {
+            // Case 2: Newly created user (authenticated, needPasswordChange)
+            response = await serverFetch.post("/auth/reset-password", {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    password: validationPayload.newPassword,
+                }),
+            });
+        }
 
         const result = await response.json();
-
         if (!result.success) {
-            throw new Error(result.message || "Reset password failed");
+            throw new Error(result.message || "Password reset failed");
         }
 
         if (result.success) {
-            revalidateTag("user-info", {expire: 0});
+            revalidateTag("user-info", { expire: 0 });            
         }
 
-        if (result.success) {
-            // await get
-            revalidateTag("user-info", { expire: 0 });
-        }
-
-        if (redirectTo) {
-            const requestedPath = redirectTo.toString();
-            if (isValidRedirectForRole(requestedPath, userRole)) {
-                redirect(`${requestedPath}?loggedIn=true`);
-            } else {
-                redirect(`${getDefaultDashboardRoute(userRole)}?loggedIn=true`);
-            }
-        } else {
-            redirect(`${getDefaultDashboardRoute(userRole)}?loggedIn=true`);
-        }
-
+        return {
+            success: true,
+            message: "Password reset successfully! Redirecting to login...",
+            redirectToLogin: true,
+        };
     } catch (error: any) {
-        // Re-throw NEXT_REDIRECT errors so Next.js can handle them
-        if (error?.digest?.startsWith("NEXT_REDIRECT")) {
-            throw error;
-        }
         return {
             success: false,
             message: error?.message || "Something went wrong",
