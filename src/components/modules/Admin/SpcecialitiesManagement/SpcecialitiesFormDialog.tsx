@@ -11,7 +11,7 @@ import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { createSpeaciality } from "@/services/admin/specialitiesManagement";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 interface ISpecialitiesFormDialogProps {
@@ -25,9 +25,16 @@ const SpecialitiesFormDialog = ({
   onClose,
   onSuccess,
 }: ISpecialitiesFormDialogProps) => {
+  
   const [state, formAction, pending] = useActionState(createSpeaciality, null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const prevStateRef = useRef(state);
 
   useEffect(() => {
+    if (state === prevStateRef.current) return;
+    prevStateRef.current = state;
     if (state && state?.success) {
       toast.success(state.message);
       onSuccess();
@@ -37,8 +44,19 @@ const SpecialitiesFormDialog = ({
     }
   }, [state, onSuccess, onClose]);
 
+  const handleClose = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+    if (selectedFile) {
+      setSelectedFile(null);
+    }
+    formRef.current?.reset();
+    onClose();
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add New Specialty</DialogTitle>

@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
 } from "@/components/ui/dialog";
 import InputFieldError from "@/components/shared/InputFieldError";
 import { Field, FieldLabel } from "@/components/ui/field";
@@ -27,9 +27,12 @@ const ScheduleFormDialog = ({
 
     const formRef = useRef<HTMLFormElement>(null);
     const [state, formAction, isPending] = useActionState(createSchedule, null);
+    const prevStateRef = useRef(state);
 
     // Handle success/error from server
     useEffect(() => {
+        if (state === prevStateRef.current) return;
+        prevStateRef.current = state;
         if (state?.success) {
             toast.success(state.message || "Schedule created successfully");
             if (formRef.current) {
