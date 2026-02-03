@@ -40,7 +40,7 @@ export default function DoctorCard({ doctor }: DoctorCard) {
 
                         <div className="flex-1 min-w-0">
                             <CardTitle className="text-lg line-clamp-1">
-                                Dr. {doctor.name}
+                                {doctor.name}
                             </CardTitle>
                             <CardDescription className="line-clamp-1">
                                 {doctor.designation}
@@ -55,9 +55,17 @@ export default function DoctorCard({ doctor }: DoctorCard) {
                                 </div>
                                 {doctor.doctorSpecialties &&
                                     doctor.doctorSpecialties.length > 0 && (
-                                        <Badge variant="secondary" className="text-xs">
-                                            {doctor.doctorSpecialties[0]?.specialities?.title}
-                                        </Badge>
+                                        <div className="flex flex-wrap gap-1">
+                                            {doctor.doctorSpecialties.map((item, index) => (
+                                                <Badge
+                                                    key={index}
+                                                    variant="secondary"
+                                                    className="text-xs"
+                                                >
+                                                    {item?.specialities?.title}
+                                                </Badge>
+                                            ))}
+                                        </div>
                                     )}
                             </div>
                         </div>

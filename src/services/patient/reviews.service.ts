@@ -32,6 +32,33 @@ export async function getReviews(queryString?: string) {
     }
 }
 
+export async function getReviewsById(doctorId?: string) {
+    try {
+        const url = doctorId ? `/review/${doctorId}` : "/review";
+
+        const response = await serverFetch.get(url, {
+            next: {
+                tags: ["reviews-list"],
+                revalidate: 30,
+            }
+        });
+        const result = await response.json();
+
+        return {
+            success: true,
+            data: result.data,
+            meta: result.meta,
+        };
+    } catch (error: any) {
+        console.error("Get reviews error:", error);
+        return {
+            success: false,
+            message: error.message || "Failed to fetch reviews",
+            data: null,
+        };
+    }
+}
+
 export async function createReview(data: IReviewFormData) {
     try {
         const response = await serverFetch.post("/review", {

@@ -3,8 +3,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getReviews } from "@/services/patient/reviews.service";
-// import { getReviews } from "@/services/patient/reviews.services";
+import { getReviewsById } from "@/services/patient/reviews.service";
 import { format } from "date-fns";
 import { Star, User } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -33,7 +32,7 @@ export default function DoctorReviews({ doctorId }: DoctorReviewsProps) {
     const loadReviews = async () => {
       try {
         setLoading(true);
-        const response = await getReviews(`?doctorId=${doctorId}&limit=10`);
+        const response = await getReviewsById(doctorId);
 
         if (response.success && response.data) {
           setReviews(response.data);
