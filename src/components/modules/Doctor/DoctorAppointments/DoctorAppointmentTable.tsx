@@ -1,16 +1,16 @@
 "use client";
 
 import ManagementTable from "@/components/shared/ManagementTable";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { toast } from "sonner";
 import {
   AppointmentStatus,
   IAppointment,
 } from "@/types/appointments.interface";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
+import ChangeAppointmentStatusDialog from "./ChangeAppointmentStatusDialog";
 import { doctorAppointmentColumns } from "./doctorAppointmentColumns";
 import DoctorAppointmentDetailDialog from "./DoctorAppointmentDetailDialog";
-import ChangeAppointmentStatusDialog from "./ChangeAppointmentStatusDialog";
 
 interface DoctorAppointmentsTableProps {
   appointments: IAppointment[];
@@ -35,9 +35,6 @@ export default function DoctorAppointmentsTable({
 
   // Custom wrapper to conditionally show edit action
   const handleEditClick = (appointment: IAppointment) => {
-    // Cannot change status for:
-    // 1. Canceled appointments
-    // 2. Completed appointments with prescriptions
     if (appointment.status === AppointmentStatus.CANCELED) {
       toast.error("Cannot change status for canceled appointments", {
         description: "Canceled appointments are final and cannot be modified.",
@@ -76,8 +73,13 @@ export default function DoctorAppointmentsTable({
           appointment={viewingAppointment}
           open={!!viewingAppointment}
           onClose={() => {
+            // Clear the state first to prevent showing stale data
+            const shouldRefresh = true;
             setViewingAppointment(null);
-            router.refresh();
+            // Then refresh to get updated data from server
+            if (shouldRefresh) {
+              router.refresh();
+            }
           }}
         />
       )}
