@@ -65,7 +65,6 @@ export default function BookAppointmentDialog({
   const hasSchedulesWithoutData =
     doctorSchedules.length > 0 && groupedSchedules.length === 0;
 
-    console.log(groupedSchedules)
 
   const handleContinue = () => {
     if (selectedSchedule) {
