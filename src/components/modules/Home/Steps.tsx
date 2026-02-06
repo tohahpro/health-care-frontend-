@@ -25,7 +25,7 @@ const StepCard = ({ icon: Icon, title, description, index }: { icon: React.Eleme
     ];
 
     return (
-        <Card className={`${bgColors[index % 8]}`}>
+        <Card className={`${bgColors[index % 8]} hover:shadow-lg transition-shadow duration-200`}>
             <CardContent className="p-4">
                  <div className="flex items-center space-x-4">
                     <div className={`p-3 rounded-full ${textColors[index % 8]} bg-white shadow-sm`}>

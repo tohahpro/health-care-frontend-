@@ -15,7 +15,7 @@ const RegisterForm = () => {
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
     const [state, formAction, isPending] = useActionState(registerPatient, null)
-    console.log(state);
+ 
 
     const getFieldError = (fieldName: string) => {
         if (state && state.errors) {
